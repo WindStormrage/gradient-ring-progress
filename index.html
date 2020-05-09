@@ -12,13 +12,19 @@
   </style>
 </head>
 <body>
-  <div id="progress"></div>
+  <div>
+    <div id="progress"></div>
+  </div>
   <script type="module">
     import Progress from './index.js'
     const progress = new Progress({
       dom: document.getElementById('progress')
     })
     progress.init()
+    setTimeout(() => {
+      // progress.setVal(.3)
+      // progress.remove()
+    }, 5000);
   </script>
 </body>
 </html>

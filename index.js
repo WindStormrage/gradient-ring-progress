@@ -1,41 +1,88 @@
 export default class Progress {
   constructor(option) {
+    this.dpr = window.devicePixelRatio || 1
     this.dom = option.dom
     // [[颜色1,百分值], ...] 
     // this.color = option.color || [['rgba(204, 0, 0, 1.000)', 0]]
-    this.color = option.color || [['red', 0], ['green', 0.5], ['yellow', 1]]
+    this.color = option.color || [['rgba(238, 73, 41, 1)', 0], ['rgba(149, 236, 105, 1)', .5], ['rgba(86, 179, 255, 1)', 1]]
     // 实现方式（svg/canvas）
     // 值
     this.value = option.value || 0.75
     // 分段数
-    this.num = option.num || 10
+    this.num = option.num || 300
     // 是否圆角
     this.round = option.round || true
     // 动画时长(需要大于分段数)
-    this.duration = (option.duration || 6000) / this.num
+    this.duration = (option.duration || 3000) / this.num
     if (this.duration < 0) this.duration = 1
     // 内圆半径
-    this.innerRadius = option.innerRadius || 50
+    this.innerRadius = (option.innerRadius || 50) * this.dpr
     // 外圆半径
-    this.outerRadius = option.outerRadius || 60
+    this.outerRadius = (option.outerRadius || 60) * this.dpr
     // 开始角度
     this.degree = (option.degree || 0) / 360 * 2 * Math.PI
     // 旋转方向
     this.counterclockwise = option.counterclockwise || false
+    // 背景环颜色
+    this.bgColor = option.bgColor || 'rgba(238, 239, 243, 1.000)'
+    // 文字颜色
+    this.fontColor = option.fontColor || 'rgba(58, 87, 168, 1)'
+    // 文字大小
+    this.fontSize = option.fontSize || 16
+    // 文字后缀
+    this.suffix = option.suffix || "%"
+    // 小数位
+    this.toFixed = option.toFixed || "1"
   }
-  async init() {
+  init() {
     if (!this.dom) return
     if (this.color.length < 1) return
     this.canvasDom = document.createElement("CANVAS")
+    this.textDom = document.createElement("DIV")
     this.canvasDom.height = this.dom.offsetHeight
     this.canvasDom.width = this.dom.offsetWidth
     this.dom.appendChild(this.canvasDom)
-    const ctx = this.canvasDom.getContext("2d")
+    this.dom.appendChild(this.textDom)
+    this.ctx = this.canvasDom.getContext("2d")
+    this.dom.style.position = 'relative'
+    this.textDom.style.position = 'absolute'
+    this.textDom.style.width = '100px'
+    this.textDom.style.height = '100px'
+    this.textDom.style.textAlign = 'center'
+    this.textDom.style.lineHeight = '100px'
+    this.textDom.style.color = this.fontColor
+    this.textDom.style.fontSize = this.fontSize + 'px'
+    this.textDom.style.top = '0'
+    this.textDom.style.left = '0'
+    this.textDom.style.right = ' 0'
+    this.textDom.style.bottom = ' 0'
+    this.textDom.style.margin = ' auto'
+    // 通过dpr来解决模糊的情况
+    this.canvasDom.width = this.dom.offsetWidth * this.dpr;
+    this.canvasDom.height = this.dom.offsetHeight * this.dpr;
+    this.canvasDom.style.width = this.dom.offsetWidth + "px"
+    this.canvasDom.style.height = this.dom.offsetHeight + "px"
+
+    this.draw()
+  }
+  async draw() {
+    // 背景环
+    this.ctx.beginPath()
+    this.ctx.arc(
+      this.canvasDom.width / 2,
+      this.canvasDom.height / 2,
+      (this.outerRadius - this.innerRadius) / 2 + this.innerRadius,
+      0,
+      2 * Math.PI
+    )
+    this.ctx.lineWidth = this.outerRadius - this.innerRadius
+    this.ctx.strokeStyle= this.bgColor
+    this.ctx.stroke()
 
     // 如果长度为1就默认为纯色
     if (this.color.length === 1) {
-      ctx.beginPath()
-      ctx.arc(
+      this.ctx.beginPath()
+      this.ctx.arc(
         this.canvasDom.width / 2,
         this.canvasDom.height / 2,
         (this.outerRadius - this.innerRadius) / 2 + this.innerRadius,
@@ -44,10 +91,10 @@ export default class Progress {
           - (Math.PI * 2 * this.value) - Math.PI / 2 + this.degree : 
           (Math.PI * 2 * this.value) - Math.PI / 2 + this.degree,
         this.counterclockwise)
-      ctx.lineWidth = this.outerRadius - this.innerRadius
-      ctx.lineCap = this.round ? "round" : "butt"
-      ctx.strokeStyle= this.color[0][0]
-      ctx.stroke()
+      this.ctx.lineWidth = this.outerRadius - this.innerRadius
+      this.ctx.lineCap = this.round ? "round" : "butt"
+      this.ctx.strokeStyle= this.color[0][0]
+      this.ctx.stroke()
       return
     }
 
@@ -76,9 +123,9 @@ export default class Progress {
     }
     // 循环开始渲染数据就好每次渲染两份的距离,原因是可能每次一份之间因为计算的精确度会出现缝隙,最后一次只渲染一份就好
     for(let i = 0; i< this.num; i++) {
-      ctx.beginPath()
+      this.ctx.beginPath()
       if(i === this.num - 1) 
-        ctx.arc(
+        this.ctx.arc(
           this.canvasDom.width / 2,
           this.canvasDom.height / 2,
           (this.outerRadius - this.innerRadius) / 2 + this.innerRadius,
@@ -90,7 +137,7 @@ export default class Progress {
             (Math.PI * 2 * this.value) / this.num * (i + 1) - Math.PI / 2 + this.degree,
           this.counterclockwise)
       else
-        ctx.arc(
+        this.ctx.arc(
           this.canvasDom.width / 2,
           this.canvasDom.height / 2,
           (this.outerRadius - this.innerRadius) / 2 + this.innerRadius,
@@ -101,10 +148,11 @@ export default class Progress {
             - Math.PI * 2 * this.value / this.num * (i + 2) - Math.PI / 2 + this.degree : 
             (Math.PI * 2 * this.value) / this.num * (i + 2) - Math.PI / 2 + this.degree,
           this.counterclockwise)
-      ctx.lineWidth = this.outerRadius - this.innerRadius
-      ctx.lineCap = this.round ? "round" : "butt"
-      ctx.strokeStyle= `rgba(${middleColor[0][i]}, ${middleColor[1][i]}, ${middleColor[2][i]}, ${middleColor[3][i]})`
-      ctx.stroke();
+      this.ctx.lineWidth = this.outerRadius - this.innerRadius
+      this.ctx.lineCap = this.round ? "round" : "butt"
+      this.ctx.strokeStyle= `rgba(${middleColor[0][i]}, ${middleColor[1][i]}, ${middleColor[2][i]}, ${middleColor[3][i]})`
+      this.ctx.stroke();
+      this.textDom.innerHTML = (this.value * 100 * i / (this.num - 1)).toFixed(this.toFixed) + this.suffix
       if (this.duration !== 0) {
         if (this.duration < 7) {
           // 把1,2,3,4,5,6毫秒间隔的分别放大6,5,4,3,2,1倍,因为settimeout的最小延迟大概是5,放大的做法是间隔放大的倍数执行一次
@@ -140,7 +188,13 @@ export default class Progress {
       }, val);
     })
   }
-  setVal() {
-
+  setVal(val) {
+    this.value = val
+    this.ctx.clearRect(0, 0, this.dom.offsetWidth, this.dom.offsetHeight); 
+    this.draw()
+  }
+  remove() {
+    this.dom.removeChild(this.canvasDom)
+    this.dom.removeChild(this.textDom)
   }
 }

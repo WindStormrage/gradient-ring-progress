@@ -1,13 +1,17 @@
 {
   "name": "gradient-ring-progress",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["进度条", "渐变色", "圆角"],
+  "keywords": ["进度条", "渐变色", "圆角", "progress", "gradient", "ring"],
   "author": "",
-  "license": "MIT"
-
+  "license": "MIT",
+  "homepage": "https://github.com/WindStormrage/gradient-ring-progress",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WindStormrage/gradient-ring-progress.git"
+  }
 }
