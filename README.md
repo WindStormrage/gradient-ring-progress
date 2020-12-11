@@ -45,4 +45,4 @@ setVal | val | 修改进度条的数据
 remove | - | 删除节点
 
 ### Example
-![image](https://progress.lap.360.cn/progress.png)
+![image](https://i.postimg.cc/zvjJT8c7/progress.png)
