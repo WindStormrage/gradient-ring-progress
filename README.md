@@ -2,7 +2,8 @@
 
 gradient-ring-progress是js编写的渐变环形进度条插件，该插件小巧不依赖其他的库
 ### Demo
-[gradient-ring-progress](http://htmlpreview.github.io/?https://github.com/WindStormrage/gradient-ring-progress/blob/master/test.html)
+[点这个看看呗](http://htmlpreview.github.io/?https://github.com/WindStormrage/gradient-ring-progress/blob/master/test.html)
+[点这个试试呗](https://codepen.io/WindStormrage/pen/XWjZmNx)
 ### Install
 ```
 npm i gradient-ring-progress -S
